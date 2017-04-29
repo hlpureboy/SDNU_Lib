@@ -56,10 +56,6 @@ def parser(text,name):
     try:
         soup=BeautifulSoup(text,"html.parser",from_encoding='utf-8')
         content=soup.find_all('div',id="mylib_info")
-        z= r'^([1-9]\d{5}[12]\d{3}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])\d{3}[0-9xX])$'
-        print type(content)
-        t=re.findall(r'\d{15}|\d{18}',text)
-        print t
         name=name+".html"
         f=open(name,'w')
         f.write("<html>")
@@ -69,25 +65,28 @@ def parser(text,name):
             f.write(str(i))
         f.write("</html>")
         f.close()
-
-        return t
+        f=open(name,'r')
+        html=f.read()
+        f.close()
+        cont=BeautifulSoup(html,"html.parser")
+        data=cont.find_all("td")
+        os.remove(name)
+        return data
     except:
         print 'html error\n'
         return
 def ConnectDB():
     try:
-        conn=MySQLdb.connect(host="localhost",user="root",passwd="root",db="student",charset="utf8")
+        conn=MySQLdb.connect(host="112.74.204.232",user="root",passwd="123pyj",db="student",charset="utf8")
         cursor=conn.cursor()
         return cursor,conn
     except:
         print "without mysql\n"
         return
-def insert(cursor,num,idcard):
+def insert(cursor,data):
     try:
-        sql="insert into stu(number,IDcard) values(%s,%s)"
-        for i in idcard:
-            IDcard=i
-        parm=(num,IDcard)
+        sql="insert into user_data(user_ID,user_Name,user_Grade,user_ID_card,user_Phone_number,user_Email) values(%s,%s,%s,%s,%s,%s)"
+        parm=(data[2].get_text(),data[1].get_text(),data[18].get_text(),data[17].get_text(),data[25].get_text(),data[16].get_text())
         cursor.execute(sql,parm)
     except:
         print 'write mysql error'
@@ -97,8 +96,8 @@ def main(u):
     c,d=ConnectDB()
     b=webdriver.Firefox()
     textt=login(u,u,b)
-    ID=parser(textt,u)
-    insert(c,u,ID)
+    data=parser(textt,u)
+    insert(c,data)
     d.commit()
     close(c)
 count=0
