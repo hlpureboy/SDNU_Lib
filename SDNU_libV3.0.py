@@ -77,7 +77,7 @@ def parser(text,name):
         return
 def ConnectDB():
     try:
-        conn=MySQLdb.connect(host="112.74.204.232",user="root",passwd="123pyj",db="student",charset="utf8")
+        conn=MySQLdb.connect(host="112.74.204.232",user="root",passwd="root",db="student",charset="utf8")
         cursor=conn.cursor()
         return cursor,conn
     except:
